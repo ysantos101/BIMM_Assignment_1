@@ -192,8 +192,16 @@ np.array(trial_nums).dump(open('array.npy', 'wb'))
 x_axis = np.load(open('array.npy', 'rb'))
 np.array(alignment_scores).dump(open('array.npy', 'wb'))
 y_axis = np.load(open('array.npy', 'rb'))
-plt.scatter(x_axis, y_axis)
-plt.axis([0, 500, 0, 1000])
+
+
+#plt.scatter(x_axis, y_axis)
+#plt.axis([0, 500, 0, 1000])
+#plt.show()
+
+plt.hist(y_axis, bins=range(0, max(y_axis), 5))
+plt.title("Distribution of Alignment Lengths:")
+plt.xlabel("Length of Best Local Alignment")
+plt.ylabel("Frequency of Alignment Length")
 plt.show()
 
 
