@@ -1,0 +1,4 @@
+Score for Optimal Local Alignment is: 
+119
+Length of the Optimal Local Alignment is: 
+969
