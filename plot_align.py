@@ -7,12 +7,12 @@ mismatch_score = int(sys.argv[3])
 indel_score = int(sys.argv[4])
 output_align = 0
     # Add boolean for whether -a is present in args
-alignment_scores = [0 for e in range(5)]
+alignment_scores = [0 for e in range(500)]
 alignment_index = 0
 
 seq_file = open(seq_fileName, "r")
 count = 0
-while(count < 5):
+while(count < 500):
     header = seq_file.readline()
     seq_1 = seq_file.readline()
     header = seq_file.readline()
@@ -36,10 +36,15 @@ while(count < 5):
     max_score = 0
     max_location_i = 0
     max_location_j = 0
-    i = 1
+    i = 0
     while i <= len(seq_1):
-        j = 1
+        j = 0
         while j <= len(seq_2):
+            if(i==0 and j == 0):
+                score_matrix[0][0] = 0
+                i += 1
+                j += 1
+                break
             cur_score = [0 for m in range(4)]
             cur_score[0] = 0
             if(i-1 >= 0 and j-1 >= 0):
@@ -68,14 +73,18 @@ while(count < 5):
                 back_matrix[i][j] = 3
             if (max(cur_score) >= max_score):
                 max_score = max(cur_score)
-                max_location_i = i
-                max_location_j = j
+                max_location_i = i-1
+                max_location_j = j-1
             j += 1
         i += 1
 
     #global alignment score is located at score_matrix[len(seq_1)][len(seq_2)]
-    end_location_i = max_location_i
+    end_location_i = max_location_i 
     end_location_j = max_location_j
+    #print "End location for alignment is: "
+    #print end_location_i, end_location_j
+    #print "Max score is: "
+    #print max_score
 
     #       ******** Already found score for optimal alignment. 
     #                   Already found end_location for optimal local alignment.
@@ -96,18 +105,24 @@ while(count < 5):
     i_max = max(len(invert_seq_1), len(invert_seq_2) )
     j_max = max(len(invert_seq_2), len(invert_seq_1)) 
     reverse_score_matrix = [[0 for x in range(len(invert_seq_1))] for y in range(len(invert_seq_2))]
+    for x in range(len(invert_seq_1)):
+        reverse_score_matrix.append([0])
+    for y in range(len(invert_seq_2)):
+        reverse_score_matrix[0].append(0)
     reverse_score_matrix[0][0] = 0
     max_score_reverse = 0
     max_location_i = 0
     max_location_j = 0
     index_i = 0
-    while index_i < len(invert_seq_1):
+    len_invert_seq_2 = len(invert_seq_2) -1
+    len_invert_seq_1 = len(invert_seq_1) -1
+    while index_i < len_invert_seq_2:
         index_j = 0
-        while index_j < len(invert_seq_2):
+        while index_j < len_invert_seq_1:
             rev_score = [0 for m in range(4)]
             rev_score[0] = 0
             if(index_i-1 >= 0 and index_j-1 >= 0):
-                if(invert_seq_1[index_i-1] == invert_seq_2[index_j-1]): # diagonal move, match
+                if(invert_seq_2[index_i-1] == invert_seq_1[index_j-1]): # diagonal move, match
                     rev_score[1] = reverse_score_matrix[index_i-1][index_j-1] + match_score
                 else:
                     rev_score[1] = reverse_score_matrix[index_i-1][index_j-1] - mismatch_score  #diagonal move, mismatch
@@ -121,6 +136,10 @@ while(count < 5):
                 rev_score[3] = reverse_score_matrix[index_i][index_j-1] - indel_score
             else:
                 rev_score[3] = -99999
+            #print "Length of invert_seq_1 and 2 are: "
+            #print len(invert_seq_1), len(invert_seq_2)
+            #print "indices that cause error are: "
+            #print index_i, index_j
             reverse_score_matrix[index_i][index_j] = max(rev_score)
             if (max(rev_score) >= max_score_reverse):
                 max_score_reverse = max(rev_score)
@@ -133,9 +152,14 @@ while(count < 5):
     start_location_i = max_location_i
     start_location_j = max_location_j
 
-    start_location_i = len(seq_1) - trim_length_seq_1 - max_location_i
-    start_location_j = len(seq_2) - trim_length_seq_2 - max_location_j
+    #start_location_i = len(seq_1) - trim_length_seq_1 - max_location_i
+    #start_location_j = len(seq_2) - trim_length_seq_2 - max_location_j
+    start_location_i = len(invert_seq_1) - max_location_i -1
+    start_location_j = len(invert_seq_2) - max_location_j -1
+
     #start locations now correspond to forward, trimmed sequences.
+    #print "Start location is: "
+    #print start_location_i, start_location_j
 
 
     #   Backtracking:
@@ -144,9 +168,10 @@ while(count < 5):
     i = end_location_i -1
     j = end_location_j -1
 
-    #print "Length of the Optimal Local Alignment is: "
+    print "Length of the Optimal Local Alignment is: "
     align_length = max(end_location_i - start_location_i, end_location_j - start_location_j)
-    #print align_length
+    #align_length = max(max_location_i, max_location_j)
+    print align_length
 
     alignment_scores[alignment_index] = align_length
     alignment_index += 1
@@ -154,22 +179,22 @@ while(count < 5):
     print (alignment_index*100) / 500
     count += 1
 
-trial_nums = [0 for e in range(5)]
+trial_nums = [0 for e in range(500)]
 #trial_nums = [0 for q in range(500)]
 cur_index = 0
-while(cur_index < 5):
+while(cur_index < 500):
     trial_nums[cur_index] = cur_index
     cur_index += 1
 
+print "List of lengths is: "
+print alignment_scores
 np.array(trial_nums).dump(open('array.npy', 'wb'))
 x_axis = np.load(open('array.npy', 'rb'))
 np.array(alignment_scores).dump(open('array.npy', 'wb'))
 y_axis = np.load(open('array.npy', 'rb'))
 plt.scatter(x_axis, y_axis)
-plt.axis([0, 5, 0, 1000])
+plt.axis([0, 500, 0, 1000])
 plt.show()
-
-
 
 
 

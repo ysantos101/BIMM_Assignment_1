@@ -7,6 +7,7 @@ count_A = 0
 count_T = 0
 count_C = 0
 count_G = 0
+file_1.write('\n')
 for i in range(0, num_sequences):
     for i in range(0, size):
         num = random.randint(0,99)
@@ -22,6 +23,7 @@ for i in range(0, num_sequences):
         if(num>=75):
             file_1.write('T')
             count_T += 1
+    file_1.write('\n')
     file_1.write('\n')
 count_A = str(count_A)
 count_C = str(count_C)
