@@ -17,9 +17,14 @@ seq_2 = seq_file.readline()
 #print "\n"
 #print "seq_2 is: "
 #print seq_2
-i_max, j_max = len(seq_1) + 10, len(seq_2) + 10;
+i_max = len(seq_1) + 10
+j_max = len(seq_2) + 10
 score_matrix = [[0 for x in range(i_max)] for y in range(j_max)]
 score_matrix[0][0] = 0
+columns = i_max
+rows = j_max
+back_matrix = [[0 for foo in range(columns)] for bar in range(rows)]
+back_matrix[0][0] = 0
 max_score = 0
 max_location_i = 0
 max_location_j = 0
@@ -32,19 +37,31 @@ while i <= len(seq_1):
         if(i-1 >= 0 and j-1 >= 0):
             if(seq_1[i-1] == seq_2[j-1]): # diagonal move, match
                 cur_score[1] = score_matrix[i-1][j-1] + match_score
+                #back_matrix[i][j] = 2
             else:
                 cur_score[1] = score_matrix[i-1][j-1] - mismatch_score  #diagonal move, mismatch
+                #back_matrix[i][j] = 2
         else:
             cur_score[1] = -99999
         if(i-1>= 0):
             cur_score[2] = score_matrix[i-1][j] - indel_score
+            #back_matrix[i][j] = 1
         else:
             cur_score[2] = -99999
         if(j-1 >= 0):
             cur_score[3] = score_matrix[i][j-1] - indel_score
+            #back_matrix[i][j] = 3
         else:
             cur_score[3] = -99999
         score_matrix[i][j] = max(cur_score)
+        if(max(cur_score) == cur_score[0]):
+            back_matrix[i][j] = 4
+        if(max(cur_score) == cur_score[1]):
+            back_matrix[i][j] = 2
+        if(max(cur_score) == cur_score[2]):
+            back_matrix[i][j] = 1
+        if(max(cur_score) == cur_score[3]):
+            back_matrix[i][j] = 3
         if (max(cur_score) >= max_score):
             max_score = max(cur_score)
             max_location_i = i
@@ -59,7 +76,8 @@ print "Local Alignment ends for seq_1 at index: "
 print max_location_i -1
 print "Local Alignment ends for seq_2 at index: "
 print max_location_j -1
-end_location = (max_location_i, max_location_j)
+end_location_i = max_location_i
+end_location_j = max_location_j
 
 #       ******** Already found score for optimal alignment. 
 #                   Already found end_location for optimal local alignment.
@@ -129,6 +147,88 @@ print "Starting location for local alignment, with respenct to seq_1 is: "
 print start_location_i
 print "Starting location for local alignment, with respect to seq_2 is: "
 print start_location_j
+
+#   Backtracking:
+rev_alignment_seq_1 = ""
+rev_alignment_seq_2 = ""
+i = end_location_i -1
+j = end_location_j -1
+
+broken = 0
+while i > start_location_i and i > 0:
+    while j >= start_location_j and j >= 0:
+        cur_dir = back_matrix[i][j]
+        if(cur_dir == 3):    #move left
+            cur_symb_1 = "-"
+            cur_symb_2 = seq_2[j]
+            j +=  -1
+        elif(cur_dir == 1):
+            cur_symb_1 = seq_1[i]
+            cur_symb_2 = "-"
+            i += -1
+        elif(cur_dir == 2):
+            cur_symb_1 = seq_1[i]
+            cur_symb_2 = seq_2[j]
+            i += -1
+            j += -1
+        elif(cur_dir == 4):
+            rev_alignment_seq_1 += seq_1[i]
+            rev_alignment_seq_2 += seq_2[j]
+            broken = 1
+            break
+            i += -1
+            j += -1
+        else:
+            broken = 1
+            break
+        rev_alignment_seq_1 += cur_symb_1
+        rev_alignment_seq_2 += cur_symb_2
+    if(broken == 1):
+        break
+alignment_seq_1 =  rev_alignment_seq_1[::-1]
+alignment_seq_2 = rev_alignment_seq_2[::-1]
+
+print "Alignments are as follows, seq_1 appearing first: "
+print alignment_seq_1
+print alignment_seq_2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
