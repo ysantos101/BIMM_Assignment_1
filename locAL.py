@@ -3,7 +3,12 @@ seq_fileName = sys.argv[1]
 match_score = int(sys.argv[2])
 mismatch_score = int(sys.argv[3])
 indel_score = int(sys.argv[4])
+output_align = 0
+if(len(sys.argv) > 5):
+    if(sys.argv[5] == "-a"):
+        output_align = 1
 # Add boolean for whether -a is present in args
+
 
 seq_file = open(seq_fileName, "r")
 header = seq_file.readline()
@@ -65,13 +70,9 @@ while i <= len(seq_1):
         j += 1
     i += 1
 
-print "Local Alignment Score is: "
+print "Score for Optimal Local Alignment is: "
 #global alignment score is located at score_matrix[len(seq_1)][len(seq_2)]
 print max_score
-print "Local Alignment ends for seq_1 at index: "
-print max_location_i -1
-print "Local Alignment ends for seq_2 at index: "
-print max_location_j -1
 end_location_i = max_location_i
 end_location_j = max_location_j
 
@@ -89,10 +90,6 @@ seq_2_trim = seq_2[:-trim_length_seq_2]
 
 invert_seq_1 = seq_1_trim[::-1]
 invert_seq_2 = seq_2_trim[::-1]
-
-print "Length of invert_seq_1 and invert_seq_2 are: "
-print len(invert_seq_1)
-print len(invert_seq_2)
 
 
 i_max = max(len(invert_seq_1), len(invert_seq_2) )
@@ -139,10 +136,6 @@ start_location_i = len(seq_1) - trim_length_seq_1 - max_location_i
 start_location_j = len(seq_2) - trim_length_seq_2 - max_location_j
 #start locations now correspond to forward, trimmed sequences.
 
-print "Starting location for local alignment, with respenct to seq_1 is: "
-print start_location_i
-print "Starting location for local alignment, with respect to seq_2 is: "
-print start_location_j
 
 #   Backtracking:
 rev_alignment_seq_1 = ""
@@ -150,43 +143,47 @@ rev_alignment_seq_2 = ""
 i = end_location_i -1
 j = end_location_j -1
 
-broken = 0
-while i > start_location_i and i > 0:
-    while j >= start_location_j and j >= 0:
-        cur_dir = back_matrix[i][j]
-        if(cur_dir == 3):    #move left
-            cur_symb_1 = "-"
-            cur_symb_2 = seq_2[j]
-            j +=  -1
-        elif(cur_dir == 1):
-            cur_symb_1 = seq_1[i]
-            cur_symb_2 = "-"
-            i += -1
-        elif(cur_dir == 2):
-            cur_symb_1 = seq_1[i]
-            cur_symb_2 = seq_2[j]
-            i += -1
-            j += -1
-        elif(cur_dir == 4):
-            rev_alignment_seq_1 += seq_1[i]
-            rev_alignment_seq_2 += seq_2[j]
-            broken = 1
+print "Length of the Optimal Local Alignment is: "
+align_length = max(end_location_i - start_location_i, end_location_j - start_location_j)
+print align_length
+if(output_align == 1):
+    broken = 0
+    while i > start_location_i and i > 0:
+        while j >= start_location_j and j >= 0:
+            cur_dir = back_matrix[i][j]
+            if(cur_dir == 3):    #move left
+                cur_symb_1 = "-"
+                cur_symb_2 = seq_2[j]
+                j +=  -1
+            elif(cur_dir == 1):
+                cur_symb_1 = seq_1[i]
+                cur_symb_2 = "-"
+                i += -1
+            elif(cur_dir == 2):
+                cur_symb_1 = seq_1[i]
+                cur_symb_2 = seq_2[j]
+                i += -1
+                j += -1
+            elif(cur_dir == 4):
+                rev_alignment_seq_1 += seq_1[i]
+                rev_alignment_seq_2 += seq_2[j]
+                broken = 1
+                break
+                i += -1
+                j += -1
+            else:
+                broken = 1
+                break
+            rev_alignment_seq_1 += cur_symb_1
+            rev_alignment_seq_2 += cur_symb_2
+        if(broken == 1):
             break
-            i += -1
-            j += -1
-        else:
-            broken = 1
-            break
-        rev_alignment_seq_1 += cur_symb_1
-        rev_alignment_seq_2 += cur_symb_2
-    if(broken == 1):
-        break
-alignment_seq_1 =  rev_alignment_seq_1[::-1]
-alignment_seq_2 = rev_alignment_seq_2[::-1]
+    alignment_seq_1 =  rev_alignment_seq_1[::-1]
+    alignment_seq_2 = rev_alignment_seq_2[::-1]
 
-print "Alignments are as follows, seq_1 appearing first: "
-print alignment_seq_1
-print alignment_seq_2
+    print "Alignments are as follows, seq_1 appearing first: "
+    print alignment_seq_1
+    print alignment_seq_2
 
 
 
