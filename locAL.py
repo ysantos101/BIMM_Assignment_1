@@ -19,10 +19,14 @@ seq_2 = seq_file.readline()
 #print seq_2
 i_max, j_max = len(seq_1) + 10, len(seq_2) + 10;
 score_matrix = [[0 for x in range(i_max)] for y in range(j_max)]
-i = 0
-while i < len(seq_1):
-    j = 0
-    while j < len(seq_2):
+score_matrix[0][0] = 0
+max_score = 0
+max_location_i = 0
+max_location_j = 0
+i = 1
+while i <= len(seq_1):
+    j = 1
+    while j <= len(seq_2):
         cur_score = [0 for m in range(4)]
         cur_score[0] = 0
         if(i-1 >= 0 and j-1 >= 0):
@@ -41,8 +45,17 @@ while i < len(seq_1):
         else:
             cur_score[3] = -99999
         score_matrix[i][j] = max(cur_score)
+        if (max(cur_score) >= max_score):
+            max_score = max(cur_score)
+            max_location_i = i
+            max_location_j = j
         j += 1
     i += 1
 
-print "Total Alignment Score is: "
-print score_matrix[len(seq_1)-1][len(seq_2)-1]
+print "Local Alignment Score is: "
+#global alignment score is located at score_matrix[len(seq_1)][len(seq_2)]
+print max_score
+print "Local Alignment ends for seq_1 at index: "
+print max_location_i
+print "Local Alignment ends for seq_2 at index: "
+print max_location_j
