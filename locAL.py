@@ -37,20 +37,16 @@ while i <= len(seq_1):
         if(i-1 >= 0 and j-1 >= 0):
             if(seq_1[i-1] == seq_2[j-1]): # diagonal move, match
                 cur_score[1] = score_matrix[i-1][j-1] + match_score
-                #back_matrix[i][j] = 2
             else:
                 cur_score[1] = score_matrix[i-1][j-1] - mismatch_score  #diagonal move, mismatch
-                #back_matrix[i][j] = 2
         else:
             cur_score[1] = -99999
         if(i-1>= 0):
             cur_score[2] = score_matrix[i-1][j] - indel_score
-            #back_matrix[i][j] = 1
         else:
             cur_score[2] = -99999
         if(j-1 >= 0):
             cur_score[3] = score_matrix[i][j-1] - indel_score
-            #back_matrix[i][j] = 3
         else:
             cur_score[3] = -99999
         score_matrix[i][j] = max(cur_score)
