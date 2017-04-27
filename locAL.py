@@ -149,6 +149,8 @@ print align_length
 if(output_align == 1):
     broken = 0
     while i > start_location_i and i > 0:
+        if(broken == 1):
+            break
         while j >= start_location_j and j >= 0:
             cur_dir = back_matrix[i][j]
             if(cur_dir == 3):    #move left

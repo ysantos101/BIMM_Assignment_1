@@ -167,11 +167,52 @@ while(count < 500):
     rev_alignment_seq_2 = ""
     i = end_location_i -1
     j = end_location_j -1
-
-    print "Length of the Optimal Local Alignment is: "
-    align_length = max(end_location_i - start_location_i, end_location_j - start_location_j)
+    broken = 0
+    while i > start_location_i and i > 0:
+        if(broken == 1):
+            break
+        while j >= start_location_j and j > 0:
+            j_start = j
+            i_start = i
+	    cur_dir = back_matrix[i][j]
+            if(cur_dir == 3):    #move left
+                cur_symb_1 = "-"
+	        cur_symb_2 = seq_2[j]
+        	j +=  -1
+	    elif(cur_dir == 1):
+	        cur_symb_1 = seq_1[i]
+	        cur_symb_2 = "-"
+	        i += -1
+	    elif(cur_dir == 2):
+	        cur_symb_1 = seq_1[i]
+	        cur_symb_2 = seq_2[j]
+	        i += -1
+	        j += -1
+	    elif(cur_dir == 4):
+	        rev_alignment_seq_1 += seq_1[i]
+	        rev_alignment_seq_2 += seq_2[j]
+	        broken = 1
+	        i += -1
+	        j += -1
+                break
+	    else:
+	        broken = 1
+	        break
+	    rev_alignment_seq_1 += cur_symb_1
+      	    rev_alignment_seq_2 += cur_symb_2
+            if(i == i_start and j == j_start):
+                i += -1
+                j += -1
+            if(j == 0):
+                broken = 1
+                break
+	if(broken == 1):
+            break
+    alignment_seq_1 =  rev_alignment_seq_1[::-1]
+    alignment_seq_2 = rev_alignment_seq_2[::-1]
+    #align_length = max(end_location_i - start_location_i, end_location_j - start_location_j)
     #align_length = max(max_location_i, max_location_j)
-    print align_length
+    align_length = max(len(alignment_seq_1), len(alignment_seq_2))
 
     alignment_scores[alignment_index] = align_length
     alignment_index += 1
