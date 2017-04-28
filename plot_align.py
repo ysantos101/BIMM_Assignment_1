@@ -14,9 +14,18 @@ seq_file = open(seq_fileName, "r")
 count = 0
 while(count < 500):
     header = seq_file.readline()
+    if(header == "Count for each Nucleotide: A[2473], C[2540], G[2600], T[2387]"):
+        break
     seq_1 = seq_file.readline()
+    if(seq_1[1] == 'o'):
+        break
     header = seq_file.readline()
+
+    if(header == "Count for each Nucleotide: A[2473], C[2540], G[2600], T[2387]"):
+        break
     seq_2 = seq_file.readline()
+    if(seq_2[1] == 'o'):
+        break
     if(seq_1[1] == 'o'):
         break
 
@@ -214,6 +223,8 @@ while(count < 500):
     #align_length = max(max_location_i, max_location_j)
     align_length = max(len(alignment_seq_1), len(alignment_seq_2))
 
+    print "Alignment length is: "
+    print align_length
     alignment_scores[alignment_index] = align_length
     alignment_index += 1
     print "Progress- Percent Completed: "
